@@ -36,7 +36,8 @@ python main.py                           # 完整运行：部署 Pages + 发送�
 powershell -ExecutionPolicy Bypass -File .\install_schedule.ps1
 ```
 
-- 任务入口：`~/.codex/skills/ai-news-briefing/scripts/run.ps1`（通过 Codex CLI 调用 `ai-news-briefing` 技能执行完整任务）\n- 任务名：`HermesAI-News-Briefing`
+- 任务入口：`~/.codex/skills/ai-news-briefing/scripts/run.ps1`（通过 Codex CLI 调用 `ai-news-briefing` 技能执行完整任务）
+- 任务名：`HermesAI-News-Briefing`
 - 时间：每天 08:00（本机时区）
 - 查看：`Get-ScheduledTask -TaskName HermesAI-News-Briefing`
 - 手动触发：`Start-ScheduledTask -TaskName HermesAI-News-Briefing`

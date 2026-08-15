@@ -80,10 +80,11 @@ def deploy(html: str, project_dir: str, cfg: dict) -> str:
         _run(["git", "remote", "add", "origin", f"git@github.com:{full}.git"], cwd=project_dir)
 
     _run(["git", "add", "docs/index.html"], cwd=project_dir)
-    code, out = _run_quiet(["git", "commit", "-m", f"Daily AI news briefing {util.now_cn():%Y-%m-%d}"],
-                           cwd=project_dir)
-    if code != 0 and "nothing to commit" not in out:
-        raise RuntimeError(f"提交失败: {out[:400]}")
+    code, _ = _run_quiet(["git", "diff", "--cached", "--quiet"], cwd=project_dir)
+    if code != 0:
+        _run(["git", "commit", "-m", f"Daily AI news briefing {util.now_cn():%Y-%m-%d}"], cwd=project_dir)
+    else:
+        log.info("内容无变化，跳过提交")
     _run(["git", "push", "-u", "origin", branch], cwd=project_dir)
 
     _enable_pages(gh, full, branch, pages_path)

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import os
+import shutil
 import subprocess
 
 import util
@@ -36,7 +37,8 @@ def send(items: list, page_url: str, cfg: dict) -> None:
     env = dict(os.environ)
     env["LARKSUITE_CLI_NO_UPDATE_NOTIFIER"] = "1"
     env["LARKSUITE_CLI_NO_SKILLS_NOTIFIER"] = "1"
-    args = ["lark-cli", "im", "+messages-send", "--as", identity,
+    lark_cli = shutil.which("lark-cli") or "lark-cli"
+    args = [lark_cli, "im", "+messages-send", "--as", identity,
             "--user-id", open_id, "--markdown", md]
     proc = subprocess.run(args, capture_output=True, text=True, encoding="utf-8", env=env)
     out = ((proc.stdout or "") + (proc.stderr or "")).strip()

@@ -1,0 +1,142 @@
+{
+  "timezone": "Asia/Shanghai",
+  "max_items": 10,
+  "lookback_hours": 48,
+  "dedupe_days": 30,
+  "gh_bin": "C:\\Program Files\\GitHub CLI\\gh.exe",
+  "github": {
+    "owner": "yangxe050102",
+    "repo": "hermes-ai-news",
+    "branch": "main",
+    "pages_path": "/docs"
+  },
+  "feishu": {
+    "as": "bot",
+    "recipient_open_id": "ou_a2488cbe8940511a2760ba7f9943e911",
+    "title_prefix": "AI 热点日报"
+  },
+  "translate": {
+    "provider": "deepseek",
+    "model": "deepseek-chat",
+    "batch_size": 5,
+    "max_tokens": 800
+  },
+  "sources": [
+    {
+      "type": "rss",
+      "name": "量子位",
+      "url": "https://www.qbitai.com/feed",
+      "weight": 1.0,
+      "lang": "zh",
+      "use_ua": true
+    },
+    {
+      "type": "rss",
+      "name": "雷锋网",
+      "url": "https://www.leiphone.com/feed",
+      "weight": 0.9,
+      "lang": "zh",
+      "use_ua": true,
+      "keywords": [
+        "AI",
+        "人工智能",
+        "大模型",
+        "OpenAI",
+        "GPT",
+        "DeepSeek",
+        "LLM",
+        "智能体",
+        "Agent",
+        "算力",
+        "芯片",
+        "机器人",
+        "自动驾驶",
+        "模型"
+      ]
+    },
+    {
+      "type": "rss",
+      "name": "极客公园",
+      "url": "https://www.geekpark.net/rss",
+      "weight": 0.8,
+      "lang": "zh",
+      "use_ua": true,
+      "keywords": [
+        "AI",
+        "人工智能",
+        "大模型",
+        "OpenAI",
+        "GPT",
+        "DeepSeek",
+        "LLM",
+        "智能体",
+        "Agent",
+        "算力",
+        "芯片",
+        "机器人",
+        "模型"
+      ]
+    },
+    {
+      "type": "rss",
+      "name": "TechCrunch AI",
+      "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+      "weight": 1.0,
+      "lang": "en",
+      "use_ua": true
+    },
+    {
+      "type": "rss",
+      "name": "The Verge AI",
+      "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+      "weight": 0.8,
+      "lang": "en",
+      "use_ua": true
+    },
+    {
+      "type": "rss",
+      "name": "MIT科技评论",
+      "url": "https://www.technologyreview.com/feed/",
+      "weight": 0.7,
+      "lang": "en",
+      "use_ua": true,
+      "keywords": [
+        "AI",
+        "artificial intelligence",
+        "machine learning",
+        "LLM",
+        "generative"
+      ]
+    },
+    {
+      "type": "rss",
+      "name": "arXiv cs.AI",
+      "url": "https://export.arxiv.org/rss/cs.AI",
+      "weight": 0.6,
+      "lang": "en",
+      "use_ua": true,
+      "keywords": [
+        "LLM",
+        "large language",
+        "agent",
+        "GPT",
+        "diffusion",
+        "reasoning",
+        "transformer"
+      ]
+    },
+    {
+      "type": "hn",
+      "name": "Hacker News",
+      "weight": 1.0,
+      "min_points": 60,
+      "lang": "en"
+    },
+    {
+      "type": "github",
+      "name": "GitHub 趋势",
+      "weight": 0.6,
+      "lang": "en"
+    }
+  ]
+}

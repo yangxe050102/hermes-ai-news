@@ -56,6 +56,38 @@ def score(item: NewsItem, now: datetime) -> float:
     return item.weight * (0.6 * rf + 0.4 * item.pop)
 
 
+def select_with_quota(fresh: list, cfg: dict) -> list:
+    """按配额选题：config.quota 中每个源保底一定比例的名额，其余名额给其他源。"""
+    limit = cfg["max_items"]
+    quotas = cfg.get("quota", {})
+    if not quotas:
+        return fresh[:limit]
+    quota_pools = {name: [] for name in quotas}
+    rest = []
+    for it in fresh:
+        pool = quota_pools.get(it.source)
+        if pool is not None:
+            pool.append(it)
+        else:
+            rest.append(it)
+    picked = []
+    for name, frac in quotas.items():
+        n = min(len(quota_pools[name]), max(0, round(frac * limit)))
+        picked.extend(quota_pools[name][:n])
+    # 剩余名额给非配额源
+    if len(picked) < limit:
+        picked.extend(rest[: limit - len(picked)])
+    # 配额源不足时，从其他配额源补足
+    if len(picked) < limit:
+        for name, frac in quotas.items():
+            base = max(0, round(frac * limit))
+            extra = quota_pools[name][base:][: limit - len(picked)]
+            picked.extend(extra)
+            if len(picked) >= limit:
+                break
+    return picked[:limit]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="AI 热点日报")
     parser.add_argument("--no-deploy", action="store_true", help="不部署 GitHub Pages")
@@ -101,7 +133,7 @@ def main() -> int:
         return 0
 
     fresh.sort(key=lambda it: score(it, util.now_utc()), reverse=True)
-    picked = fresh[: cfg["max_items"]]
+    picked = select_with_quota(fresh, cfg)
 
     translator = Translator(
         cache_path=os.path.join(ROOT, "state", "translations.json"),

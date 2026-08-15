@@ -34,7 +34,7 @@
       "type": "rss",
       "name": "雷锋网",
       "url": "https://www.leiphone.com/feed",
-      "weight": 0.9,
+      "weight": 1.0,
       "lang": "zh",
       "use_ua": true,
       "keywords": [
@@ -58,7 +58,7 @@
       "type": "rss",
       "name": "极客公园",
       "url": "https://www.geekpark.net/rss",
-      "weight": 0.8,
+      "weight": 1.0,
       "lang": "zh",
       "use_ua": true,
       "keywords": [
@@ -79,17 +79,9 @@
     },
     {
       "type": "rss",
-      "name": "TechCrunch AI",
-      "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
-      "weight": 1.0,
-      "lang": "en",
-      "use_ua": true
-    },
-    {
-      "type": "rss",
       "name": "The Verge AI",
       "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
-      "weight": 0.8,
+      "weight": 1.0,
       "lang": "en",
       "use_ua": true
     },
@@ -97,7 +89,7 @@
       "type": "rss",
       "name": "MIT科技评论",
       "url": "https://www.technologyreview.com/feed/",
-      "weight": 0.7,
+      "weight": 1.0,
       "lang": "en",
       "use_ua": true,
       "keywords": [
@@ -106,23 +98,6 @@
         "machine learning",
         "LLM",
         "generative"
-      ]
-    },
-    {
-      "type": "rss",
-      "name": "arXiv cs.AI",
-      "url": "https://export.arxiv.org/rss/cs.AI",
-      "weight": 0.6,
-      "lang": "en",
-      "use_ua": true,
-      "keywords": [
-        "LLM",
-        "large language",
-        "agent",
-        "GPT",
-        "diffusion",
-        "reasoning",
-        "transformer"
       ]
     },
     {
@@ -135,8 +110,11 @@
     {
       "type": "github",
       "name": "GitHub 趋势",
-      "weight": 0.6,
+      "weight": 0.5,
       "lang": "en"
     }
-  ]
+  ],
+  "quota": {
+    "GitHub 趋势": 0.5
+  }
 }

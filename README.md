@@ -30,7 +30,7 @@ hermes-ai-news/
 ├── deploy_github.py       # GitHub Pages 部署
 ├── feishu_notify.py       # 飞书发送（lark-cli）
 ├── sources/               # 各数据源适配器（RSS / HN / GitHub）
-├── run.ps1                # 快捷运行脚本（定时任务已改为调用 ai-news-briefing 技能）
+├── skill/                  # ai-news-briefing 技能副本（仓库内版本化备份）
 ├── install_schedule.ps1   # 一键安装每日 08:00 计划任务
 ├── uninstall_schedule.ps1 # 卸载计划任务
 ├── docs/                  # 部署文档 + 发布到 Pages 的 HTML
@@ -54,7 +54,7 @@ powershell -ExecutionPolicy Bypass -File install_schedule.ps1
 
 ## 封装为 Codex 技能
 
-- 技能名：`ai-news-briefing`（位于 `~/.codex/skills/ai-news-briefing/`，含 `SKILL.md` 使用说明）
+- 技能名：`ai-news-briefing`，本仓库 `skill/` 目录保存了技能副本（版本化备份），实际安装在 `~/.codex/skills/ai-news-briefing/`（复制 `skill/` 下内容过去即可重新安装）
 - 手动调用：在 Codex 中说「运行 AI 热点日报」或 `$ai-news-briefing`，会读取技能说明并按流程执行
 - 定时任务：`HermesAI-News-Briefing`（每天 08:00）入口为 `~/.codex/skills/ai-news-briefing/scripts/run.ps1`，由 Codex CLI 加载技能后执行 `python main.py`
 - 查看/触发：`Get-ScheduledTask -TaskName HermesAI-News-Briefing` / `Start-ScheduledTask -TaskName HermesAI-News-Briefing`
@@ -77,5 +77,6 @@ powershell -ExecutionPolicy Bypass -File install_schedule.ps1
 - `translate`：DeepSeek 模型与批大小
 
 详细部署与排障见 [docs/DEPLOY.md](docs/DEPLOY.md)。
+
 
 

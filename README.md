@@ -8,7 +8,7 @@
 
 ## 功能特性
 
-- **多源聚合**：RSS（量子位、雷锋网、极客公园、The Verge AI、MIT 科技评论）+ API（Hacker News Algolia、GitHub 趋势仓库）
+- **多源聚合**：RSS（量子位、雷锋网、极客公园、MIT 科技评论）+ API（Hacker News Algolia、GitHub 趋势仓库）
 - **配额选题**：GitHub 趋势保底占每日一半名额（默认 10 条中 5 条），其余源按热度排名补齐
 - **全中文**：英文内容由 DeepSeek 批量翻译，带缓存，只翻译新内容、省钱省时
 - **去重**：按 URL 规范化后哈希持久化去重，保留 30 天，避免跨天重复

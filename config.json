@@ -79,14 +79,6 @@
     },
     {
       "type": "rss",
-      "name": "The Verge AI",
-      "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
-      "weight": 1.0,
-      "lang": "en",
-      "use_ua": true
-    },
-    {
-      "type": "rss",
       "name": "MIT科技评论",
       "url": "https://www.technologyreview.com/feed/",
       "weight": 1.0,

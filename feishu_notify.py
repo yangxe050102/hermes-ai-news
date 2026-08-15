@@ -13,18 +13,11 @@ log = logging.getLogger("briefing")
 
 
 def build_post(items: list, page_url: str, date_str: str) -> dict:
-    """构造飞书 post 富文本：标题 + 10 条带链接的标题 + 页面链接（仅保留标题，简洁易读）。"""
-    content = []
-    for i, it in enumerate(items, 1):
-        content.append([
-            {"tag": "text", "text": f"{i}. "},
-            {"tag": "a", "text": it.display_title, "href": it.url},
-        ])
-    content.append([{"tag": "text", "text": " "}])
-    content.append([
+    """构造飞书 post 富文本：仅保留标题行和完整版网页链接行，内容全部在网页里。"""
+    content = [[
         {"tag": "text", "text": "📎 完整版网页："},
         {"tag": "a", "text": page_url, "href": page_url},
-    ])
+    ]]
     return {"zh_cn": {"title": f"📰 AI 热点日报 · {date_str}", "content": content}}
 
 

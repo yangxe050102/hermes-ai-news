@@ -13,18 +13,14 @@ log = logging.getLogger("briefing")
 
 
 def build_post(items: list, page_url: str, date_str: str) -> dict:
-    """构造飞书 post 富文本：标题 + 10 条带链接的标题 + 页面链接。"""
-    sources = list(dict.fromkeys(it.source for it in items))
-    suffix = " 等" if len(sources) > 6 else ""
-    content = [[{"tag": "text", "text": f"来源：{' · '.join(sources[:6])}{suffix}"}]]
+    """构造飞书 post 富文本：标题 + 10 条带链接的标题 + 页面链接（仅保留标题，简洁易读）。"""
+    content = []
     for i, it in enumerate(items, 1):
         content.append([
             {"tag": "text", "text": f"{i}. "},
             {"tag": "a", "text": it.display_title, "href": it.url},
         ])
-        if it.display_summary:
-            content.append([{"tag": "text", "text": util.truncate(it.display_summary, 80)}])
-        content.append([{"tag": "text", "text": f"— {it.source}"}])
+    content.append([{"tag": "text", "text": " "}])
     content.append([
         {"tag": "text", "text": "📎 完整版网页："},
         {"tag": "a", "text": page_url, "href": page_url},

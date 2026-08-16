@@ -1,17 +1,15 @@
-"""基于 URL 哈希的持久化去重（默认保留 30 天）。"""
+"""基于 URL 哈希的当日去重：同一天内不重复发送，跨天自动重置。"""
 from __future__ import annotations
 
 import json
 import os
-from datetime import timedelta
 
 import util
 
 
 class SeenStore:
-    def __init__(self, path: str, keep_days: int = 30) -> None:
+    def __init__(self, path: str) -> None:
         self.path = path
-        self.keep_days = keep_days
         self._data: dict[str, str] = self._load()
 
     def _load(self) -> dict[str, str]:
@@ -24,18 +22,19 @@ class SeenStore:
         except Exception:  # noqa: BLE001
             return {}
 
+    def _today(self) -> str:
+        return util.now_cn().date().isoformat()
+
     def is_seen(self, url: str) -> bool:
-        return util.url_hash(url) in self._data
+        # 只有当天标记过的才算已发送，跨天记录自动视为未发送
+        return self._data.get(util.url_hash(url)) == self._today()
 
     def mark(self, url: str) -> None:
-        self._data[util.url_hash(url)] = util.now_cn().isoformat()
+        self._data[util.url_hash(url)] = self._today()
 
     def prune(self) -> None:
-        cutoff = util.now_cn() - timedelta(days=self.keep_days)
-        self._data = {
-            k: v for k, v in self._data.items()
-            if (util.parse_dt(v) or cutoff) >= cutoff
-        }
+        today = self._today()
+        self._data = {k: v for k, v in self._data.items() if v == today}
 
     def save(self) -> None:
         self.prune()

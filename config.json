@@ -2,8 +2,7 @@
   "timezone": "Asia/Shanghai",
   "max_items": 10,
   "lookback_hours": 48,
-  "dedupe_days": 30,
-  "gh_bin": "C:\\Program Files\\GitHub CLI\\gh.exe",
+    "gh_bin": "C:\\Program Files\\GitHub CLI\\gh.exe",
   "github": {
     "owner": "yangxe050102",
     "repo": "hermes-ai-news",

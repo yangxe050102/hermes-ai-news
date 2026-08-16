@@ -11,7 +11,7 @@
 - **多源聚合**：RSS（量子位、雷锋网、极客公园、MIT 科技评论）+ API（Hacker News Algolia、GitHub 趋势仓库）
 - **配额选题**：GitHub 趋势保底占每日一半名额（默认 10 条中 5 条），其余源按热度排名补齐
 - **全中文**：英文内容由 DeepSeek 批量翻译，带缓存，只翻译新内容、省钱省时
-- **去重**：按 URL 规范化后哈希持久化去重，保留 30 天，避免跨天重复
+- **去重**：仅当日去重，同一天内不重复发送，跨天自动重置，保证每天都是新一期
 - **HTML 简报**：单文件响应式页面，按热度排序，手机/桌面均适配
 - **GitHub Pages 部署**：自动创建/更新公开仓库并启用 Pages
 - **失败重试**：抓取 3 次指数退避重试；发送失败时保留状态，下次运行自动补发
@@ -24,7 +24,7 @@ hermes-ai-news/
 ├── config.json            # 源、收件人、仓库、翻译等全部配置
 ├── main.py                # 主流程入口
 ├── util.py                # 网络请求、日志、HTML 清理、URL 规范化
-├── dedupe.py              # 持久化去重（30 天）
+├── dedupe.py              # 当日去重（同一天不重复发送）
 ├── translate.py           # DeepSeek 翻译（带缓存）
 ├── html_report.py         # HTML 简报渲染
 ├── deploy_github.py       # GitHub Pages 部署

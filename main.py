@@ -99,7 +99,7 @@ def main() -> int:
     util.load_dotenv(os.path.join(ROOT, ".env"))
     log.info("====== AI 热点日报 开始 ======")
 
-    seen = SeenStore(os.path.join(ROOT, "state", "seen.json"), keep_days=cfg["dedupe_days"])
+    seen = SeenStore(os.path.join(ROOT, "state", "seen.json"))
     window_start = util.now_utc() - timedelta(hours=cfg["lookback_hours"])
 
     all_items: list[NewsItem] = []
@@ -127,7 +127,7 @@ def main() -> int:
             continue
         fresh.append(it)
 
-    log.info("候选 %d 条，过滤重复/超窗 %d 条", len(fresh), skipped)
+    log.info("候选 %d 条，过滤当日已发/超窗 %d 条", len(fresh), skipped)
     if not fresh:
         log.warning("今天没有可发送的新内容")
         return 0

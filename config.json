@@ -2,7 +2,6 @@
   "timezone": "Asia/Shanghai",
   "max_items": 10,
   "lookback_hours": 48,
-    "gh_bin": "C:\\Program Files\\GitHub CLI\\gh.exe",
   "github": {
     "owner": "yangxe050102",
     "repo": "hermes-ai-news",
@@ -16,7 +15,7 @@
   },
   "translate": {
     "provider": "deepseek",
-    "model": "deepseek-chat",
+    "model": "deepseek-v4-flash",
     "batch_size": 5,
     "max_tokens": 800
   },

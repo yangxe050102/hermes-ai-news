@@ -2,29 +2,25 @@
   "timezone": "Asia/Shanghai",
   "max_items": 10,
   "lookback_hours": 48,
+  "backfill_hours": 168,
   "github": {
     "owner": "yangxe050102",
     "repo": "hermes-ai-news",
     "branch": "main",
     "pages_path": "/docs"
   },
-  "feishu": {
-    "as": "bot",
-    "recipient_open_id": "ou_a2488cbe8940511a2760ba7f9943e911",
-    "title_prefix": "AI 热点日报"
-  },
   "translate": {
     "provider": "deepseek",
     "model": "deepseek-v4-flash",
     "batch_size": 5,
-    "max_tokens": 800
+    "max_tokens": 4000
   },
   "sources": [
     {
       "type": "rss",
       "name": "量子位",
       "url": "https://www.qbitai.com/feed",
-      "weight": 1.0,
+      "weight": 1.1,
       "lang": "zh",
       "use_ua": true
     },
@@ -32,7 +28,7 @@
       "type": "rss",
       "name": "雷锋网",
       "url": "https://www.leiphone.com/feed",
-      "weight": 1.0,
+      "weight": 1.1,
       "lang": "zh",
       "use_ua": true,
       "keywords": [
@@ -56,7 +52,7 @@
       "type": "rss",
       "name": "极客公园",
       "url": "https://www.geekpark.net/rss",
-      "weight": 1.0,
+      "weight": 1.1,
       "lang": "zh",
       "use_ua": true,
       "keywords": [
@@ -79,7 +75,7 @@
       "type": "rss",
       "name": "MIT科技评论",
       "url": "https://www.technologyreview.com/feed/",
-      "weight": 1.0,
+      "weight": 1.1,
       "lang": "en",
       "use_ua": true,
       "keywords": [
@@ -93,18 +89,9 @@
     {
       "type": "hn",
       "name": "Hacker News",
-      "weight": 1.0,
+      "weight": 1.1,
       "min_points": 60,
       "lang": "en"
-    },
-    {
-      "type": "github",
-      "name": "GitHub 趋势",
-      "weight": 0.5,
-      "lang": "en"
     }
-  ],
-  "quota": {
-    "GitHub 趋势": 0.5
-  }
+  ]
 }

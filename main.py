@@ -1,4 +1,4 @@
-"""AI 热点日报主程序：抓取 → 翻译 → HTML → GitHub Pages → 飞书。"""
+"""AI 热点日报主程序：抓取 → 翻译 → HTML → GitHub Pages → 微信（由 Hermes cron 推送）。"""
 from __future__ import annotations
 
 import argparse
@@ -13,7 +13,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import util  # noqa: E402
 from dedupe import SeenStore  # noqa: E402
 from deploy_github import deploy  # noqa: E402
-from feishu_notify import send  # noqa: E402
 from html_report import render_html  # noqa: E402
 from sources.base import NewsItem  # noqa: E402
 from sources.github_source import GitHubTrendingSource  # noqa: E402
@@ -91,7 +90,9 @@ def select_with_quota(fresh: list, cfg: dict) -> list:
 def main() -> int:
     parser = argparse.ArgumentParser(description="AI 热点日报")
     parser.add_argument("--no-deploy", action="store_true", help="不部署 GitHub Pages")
-    parser.add_argument("--no-notify", action="store_true", help="不发送飞书")
+    parser.add_argument("--no-notify", action="store_true", help="已废弃：简报直接由 Hermes cron 推送微信，不再发送飞书（参数保留兼容）")
+    parser.add_argument("--include-seen-today", action="store_true",
+                        help="忽略当天已标记（用于当天条目不足时补跑/重新选题，避免被 seen 过滤）")
     args = parser.parse_args()
 
     cfg = load_config()
@@ -119,7 +120,7 @@ def main() -> int:
         if key in seen_in_run:
             continue
         seen_in_run.add(key)
-        if seen.is_seen(it.url):
+        if seen.is_seen(it.url) and not args.include_seen_today:
             skipped += 1
             continue
         if it.windowed and it.published and it.published < window_start:
@@ -128,11 +129,47 @@ def main() -> int:
         fresh.append(it)
 
     log.info("候选 %d 条，过滤当日已发/超窗 %d 条", len(fresh), skipped)
+
+    # 候选不足 max_items 时回溯（默认 7 天）补足，避免"新闻少的日子"只出 5-7 条
+    backfilled = False
+    if 0 < len(fresh) < cfg["max_items"]:
+        backfill_hours = cfg.get("backfill_hours", 168)
+        backfill_start = util.now_utc() - timedelta(hours=backfill_hours)
+        have = {util.normalize_url(it.url) for it in fresh}
+        extra: list[NewsItem] = []
+        for it in all_items:
+            key = util.normalize_url(it.url)
+            if key in have:
+                continue
+            if seen.is_seen(it.url) and not args.include_seen_today:
+                continue
+            if it.windowed and it.published and it.published < backfill_start:
+                continue
+            have.add(key)
+            extra.append(it)
+        if extra:
+            # 48h 内的优先，回溯条目只用于补位
+            fresh.sort(key=lambda it: score(it, util.now_utc()), reverse=True)
+            extra.sort(key=lambda it: score(it, util.now_utc()), reverse=True)
+            # 补位按来源轮询，避免同一天被单一源刷屏
+            by_src: dict[str, list] = {}
+            for it in extra:
+                by_src.setdefault(it.source, []).append(it)
+            balanced: list[NewsItem] = []
+            while len(balanced) < len(extra):
+                for pool in by_src.values():
+                    if pool:
+                        balanced.append(pool.pop(0))
+            log.info("候选不足，回溯 %d 小时补入 %d 条（按来源轮询）", backfill_hours, len(balanced))
+            fresh.extend(balanced)
+            backfilled = True
+
     if not fresh:
         log.warning("今天没有可发送的新内容")
         return 0
 
-    fresh.sort(key=lambda it: score(it, util.now_utc()), reverse=True)
+    if not backfilled:
+        fresh.sort(key=lambda it: score(it, util.now_utc()), reverse=True)
     picked = select_with_quota(fresh, cfg)
 
     translator = Translator(
@@ -156,21 +193,10 @@ def main() -> int:
     else:
         page_url = f"https://{cfg['github']['owner']}.github.io/{cfg['github']['repo']}/"
 
-    notified = False
-    if args.no_notify:
-        log.info("跳过飞书发送（--no-notify），不记录已发送状态")
-    else:
-        try:
-            send(picked, page_url, cfg)
-            notified = True
-        except Exception as exc:  # noqa: BLE001
-            log.error("飞书发送失败: %s（下次运行将自动重试）", exc)
-            return 1
-
-    if notified:
-        for it in picked:
-            seen.mark(it.url)
-        seen.save()
+    # 交付方式：简报由 Hermes cron 以最终回复直接推送到微信，main.py 只负责生成与部署。
+    for it in picked:
+        seen.mark(it.url)
+    seen.save()
     log.info("====== 完成：%d 条，页面 %s ======", len(picked), page_url)
     return 0
 

@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import argparse
+import difflib
 import json
 import logging
 import os
+import re
 import sys
 from datetime import datetime, timedelta
 
@@ -53,6 +55,36 @@ def score(item: NewsItem, now: datetime) -> float:
         age_h = (now - item.published).total_seconds() / 3600.0
         rf = max(0.0, 1.0 - age_h / 48.0)
     return item.weight * (0.6 * rf + 0.4 * item.pop)
+
+
+def _norm_title(text: str) -> str:
+    """标题归一化：去掉标点/空白，只留文字与数字，便于比对同一事件。"""
+    return re.sub(r"[\W_]+", "", (text or "").lower())
+
+
+def _same_story(a: str, b: str) -> bool:
+    """判断两个归一化标题是否指同一件事（跨源转载/同题不同源）。"""
+    if not a or not b:
+        return False
+    if a == b:
+        return True
+    if len(a) >= 14 and len(b) >= 14 and (a in b or b in a):
+        return True
+    return difflib.SequenceMatcher(None, a, b).ratio() >= 0.9
+
+
+def dedupe_by_title(items: list, extra_keys: list | None = None) -> list:
+    """按标题去重（保留分数靠前的那条），extra_keys 为已入选条目的标题键。"""
+    kept: list = []
+    keys: list[str] = list(extra_keys or [])
+    for it in items:
+        key = _norm_title(it.display_title)
+        if any(_same_story(key, k) for k in keys):
+            log.info("标题重复，跳过：%s（%s）", it.display_title, it.source)
+            continue
+        kept.append(it)
+        keys.append(key)
+    return kept
 
 
 def select_with_quota(fresh: list, cfg: dict) -> list:
@@ -115,6 +147,7 @@ def main() -> int:
     fresh: list[NewsItem] = []
     skipped = 0
     seen_in_run: set[str] = set()
+    block_words = [w.lower() for w in cfg.get("title_blocklist", []) if w]
     for it in all_items:
         key = util.normalize_url(it.url)
         if key in seen_in_run:
@@ -124,6 +157,12 @@ def main() -> int:
             skipped += 1
             continue
         if it.windowed and it.published and it.published < window_start:
+            skipped += 1
+            continue
+        title_l = (it.display_title or "").lower()
+        hit = next((w for w in block_words if w in title_l), None)
+        if hit:
+            log.info("标题命中黑名单（%s），跳过：%s", hit, it.display_title)
             skipped += 1
             continue
         fresh.append(it)
@@ -170,6 +209,8 @@ def main() -> int:
 
     if not backfilled:
         fresh.sort(key=lambda it: score(it, util.now_utc()), reverse=True)
+    # URL 去重之后再做一层标题去重：同一稿件同源转载（不同 URL、同标题）很常见
+    fresh = dedupe_by_title(fresh)
     picked = select_with_quota(fresh, cfg)
 
     translator = Translator(

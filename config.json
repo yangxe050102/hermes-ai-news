@@ -3,6 +3,24 @@
   "max_items": 10,
   "lookback_hours": 48,
   "backfill_hours": 168,
+  "quota": {
+    "量子位": 0.2,
+    "雷锋网": 0.2,
+    "极客公园": 0.2,
+    "MIT科技评论": 0.1,
+    "Hacker News": 0.3
+  },
+  "title_blocklist": [
+    "嘉宾阵容",
+    "创新大会",
+    "盛典",
+    "表彰",
+    "活动报名",
+    "直播预告",
+    "倒计时",
+    "fuck",
+    "shit"
+  ],
   "github": {
     "owner": "yangxe050102",
     "repo": "hermes-ai-news",

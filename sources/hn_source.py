@@ -1,26 +1,29 @@
 """Hacker News 源（Algolia API）。"""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .base import NewsItem
 import util
 
-API = "https://hn.algolia.com/api/v1/search"
+API = "https://hn.algolia.com/api/v1/search_by_date"
 
 
 class HackerNewsSource:
     def __init__(self, name: str, weight: float = 1.0, min_points: int = 60,
-                 query: str = "AI") -> None:
+                 query: str = "AI", max_age_days: int = 7) -> None:
         self.name = name
         self.weight = weight
         self.min_points = min_points
         self.query = query
+        self.max_age_days = max_age_days
 
     def fetch(self) -> list[NewsItem]:
+        # search_by_date：按时间倒序取最近的高分帖；search 接口按相关度排，会捞出多年前的旧帖。
+        since = int((util.now_utc() - timedelta(days=self.max_age_days)).timestamp())
         url = (
             f"{API}?query={util.quote(self.query)}&tags=story"
-            f"&hitsPerPage=40&numericFilters=points%3E%3D{self.min_points}"
+            f"&hitsPerPage=40&numericFilters=points%3E%3D{self.min_points}%2Ccreated_at_i%3E{since}"
         )
         data = util.http_get_json(url, headers=util.JSON_HEADERS, timeout=25)
         items: list[NewsItem] = []

@@ -73,17 +73,35 @@ def _same_story(a: str, b: str) -> bool:
     return difflib.SequenceMatcher(None, a, b).ratio() >= 0.9
 
 
+def _common_prefix_len(a: str, b: str) -> int:
+    n = 0
+    for x, y in zip(a, b):
+        if x != y:
+            break
+        n += 1
+    return n
+
+
 def dedupe_by_title(items: list, extra_keys: list | None = None) -> list:
-    """按标题去重（保留分数靠前的那条），extra_keys 为已入选条目的标题键。"""
+    """按标题去重（保留分数靠前的那条），extra_keys 为已入选条目的 (标题键, 源)。"""
     kept: list = []
-    keys: list[str] = list(extra_keys or [])
+    keys: list = list(extra_keys or [])
     for it in items:
         key = _norm_title(it.display_title)
-        if any(_same_story(key, k) for k in keys):
+        dup = False
+        for k, ksrc in keys:
+            if _same_story(key, k):
+                dup = True
+                break
+            # 同源且标题前 10 个归一化字符完全一致 → 同一事件的拆稿/连载，视为重复
+            if ksrc == it.source and _common_prefix_len(key, k) >= 10:
+                dup = True
+                break
+        if dup:
             log.info("标题重复，跳过：%s（%s）", it.display_title, it.source)
             continue
         kept.append(it)
-        keys.append(key)
+        keys.append((key, it.source))
     return kept
 
 
